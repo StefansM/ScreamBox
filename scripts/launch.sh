@@ -1,1 +1,1 @@
-uvicorn --host 0.0.0.0 screaming-box-web.main:app
+uvicorn --host 0.0.0.0 main:app
