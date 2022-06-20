@@ -1,4 +1,4 @@
-from ScreamingBoxPi.flasher import Flasher
+from flasher import Flasher
 from scream import Screamer
 from poller import Poller
 
