@@ -16,9 +16,9 @@ class EventPayload(pydantic.BaseModel):
     event_type: str
     resource_type: str
     occurred_at: datetime.datetime
-    agent: Optional[str]
-    client: Optional[str]
-    data: Dict[str, Any]
+    agent: Any
+    client: Any
+    data: Any
 
 
 class WebhookEvent(pydantic.BaseModel):
