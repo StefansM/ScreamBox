@@ -1,19 +1,20 @@
 from scream import Screamer
-import screambox_api
 import time
+from poller import Poller
 
 
 def main():
     screamer = Screamer()
+    poller = Poller()
 
     while True:
-        should_scream = screambox_api.poll_api()
+        should_scream = poller.poll_api()
 
         if should_scream:
             screamer.scream()
         else:
             screamer.stop()
-        time.sleep(0.1)
+        time.sleep(5)
 
 
 if __name__ == '__main__':
