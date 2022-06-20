@@ -1,3 +1,5 @@
+import time
+
 from flasher import Flasher
 from scream import Screamer
 from poller import Poller
@@ -16,6 +18,8 @@ def main():
         else:
             screamer.stop()
             flasher.stop()
+
+        time.sleep(5)
 
 
 if __name__ == '__main__':
