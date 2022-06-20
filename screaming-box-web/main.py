@@ -1,48 +1,25 @@
 from __future__ import annotations
 
-import datetime
-from typing import Any, Optional, Dict
-
 import fastapi
-import pydantic
 import uvicorn
-
-
-class PollResult(pydantic.BaseModel):
-    is_open: bool
-
-
-class WebhookResult(pydantic.BaseModel):
-    accepted: bool
-
-
-class EventPayload(pydantic.BaseModel):
-    id: str
-    event_type: str
-    resource_type: str
-    occurred_at: datetime.datetime
-    agent: Optional[str]
-    client: Optional[str]
-    data: Dict[str, Any]
-
-
-class WebhookEvent(pydantic.BaseModel):
-    event: EventPayload
-
+import webhook_event_handler
+from model import PollResult, WebhookResult, WebhookEvent
 
 app = fastapi.FastAPI()
 
 
 @app.get("/poll", response_model=PollResult)
 def poll():
+    open_incidents = webhook_event_handler.get_open_incidents()
     return PollResult(
-        is_open=True,
+        is_open=len(open_incidents) > 0,
     )
 
 
 @app.post("/trigger", response_model=WebhookResult)
 def trigger(event: WebhookEvent):
     print(event)
+    webhook_event_handler.handle_event(event)
     return WebhookResult(accepted=True)
 
 
