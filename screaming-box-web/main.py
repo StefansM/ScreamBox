@@ -36,7 +36,7 @@ app = fastapi.FastAPI()
 @app.get("/poll", response_model=PollResult)
 def poll():
     return PollResult(
-        is_open=False,
+        is_open=True,
     )
 
 
