@@ -1,7 +1,8 @@
-from typing import Any, Optional, Dict
+import datetime
+from typing import Any, Dict, Optional
 
 import pydantic
-import datetime
+
 
 class PollResult(pydantic.BaseModel):
     is_open: bool
@@ -16,9 +17,9 @@ class EventPayload(pydantic.BaseModel):
     event_type: str
     resource_type: str
     occurred_at: datetime.datetime
-    agent: Any
-    client: Any
-    data: Any
+    agent: Optional[Any]
+    client: Optional[Any]
+    data: Optional[Dict[str, Any]]
 
 
 class WebhookEvent(pydantic.BaseModel):

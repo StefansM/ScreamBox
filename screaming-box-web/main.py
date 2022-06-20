@@ -29,7 +29,6 @@ def poll():
 
 @app.post("/trigger", response_model=WebhookResult)
 def trigger(event: WebhookEvent):
-    print(event)
     webhook_event_handler.handle_event(event)
     return WebhookResult(accepted=True)
 

@@ -8,7 +8,10 @@ def handle_event(event: WebhookEvent):
 
 
 def _save_event(event: WebhookEvent):
-    events_map[event.event.id] = event.event
+    if event.event.data and "incident_key" in event.event.data:
+        incident_id = event.event.data["incident_key"]
+        print(f"Saving incident {incident_id} with status {event.event.event_type}")
+        events_map[incident_id] = event.event
 
 
 def get_open_incidents():
