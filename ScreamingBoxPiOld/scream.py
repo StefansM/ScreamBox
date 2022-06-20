@@ -1,3 +1,4 @@
+import threading
 import vlc
 import time
 
@@ -6,6 +7,7 @@ SCREAM_FILE = "Scream.mp3"
 class Screamer:
     def __init__(self):
         self.is_screaming = False
+        threading.Thread(target=self.__run_scream()).start()
 
     def scream(self):
         self.is_screaming = True
