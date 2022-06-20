@@ -1,10 +1,12 @@
-from typing import Any, Optional, Dict
+import datetime
+from typing import Any, Dict, Optional, List
 
 import pydantic
-import datetime
+
 
 class PollResult(pydantic.BaseModel):
     is_open: bool
+    titles: List[str]
 
 
 class WebhookResult(pydantic.BaseModel):
@@ -16,9 +18,9 @@ class EventPayload(pydantic.BaseModel):
     event_type: str
     resource_type: str
     occurred_at: datetime.datetime
-    agent: Optional[str]
-    client: Optional[str]
-    data: Dict[str, Any]
+    agent: Optional[Any]
+    client: Optional[Any]
+    data: Optional[Dict[str, Any]]
 
 
 class WebhookEvent(pydantic.BaseModel):
