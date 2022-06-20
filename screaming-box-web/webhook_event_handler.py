@@ -1,6 +1,8 @@
-from model import WebhookEvent
+from typing import Dict
 
-events_map = {}
+from model import WebhookEvent, EventPayload, PollResult
+
+events_map: Dict[str, EventPayload] = {}
 
 
 def handle_event(event: WebhookEvent):
@@ -14,9 +16,15 @@ def _save_event(event: WebhookEvent):
         events_map[incident_id] = event.event
 
 
-def get_open_incidents():
+def get_open_incidents() -> PollResult:
     open_incidents = []
+    titles = []
     for event in events_map.values():
         if event.event_type in ['incident.reopened', 'incident.triggered']:
             open_incidents.append(event)
-    return open_incidents
+            if "title" in event.data:
+                titles.append(event.data["title"])
+
+    is_open = bool(open_incidents)
+
+    return PollResult(is_open=is_open, titles=titles)

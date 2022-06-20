@@ -1,11 +1,12 @@
 import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 import pydantic
 
 
 class PollResult(pydantic.BaseModel):
     is_open: bool
+    titles: List[str]
 
 
 class WebhookResult(pydantic.BaseModel):

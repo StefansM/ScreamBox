@@ -21,10 +21,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.get("/poll", response_model=PollResult)
 def poll():
-    open_incidents = webhook_event_handler.get_open_incidents()
-    return PollResult(
-        is_open=len(open_incidents) > 0,
-    )
+    return webhook_event_handler.get_open_incidents()
 
 
 @app.post("/trigger", response_model=WebhookResult)
