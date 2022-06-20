@@ -47,4 +47,4 @@ def trigger(event: WebhookEvent):
 
 
 if __name__ == '__main__':
-    uvicorn.run("screambox.main:app", reload=True)
+    uvicorn.run("main:app", reload=True)
