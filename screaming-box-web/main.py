@@ -16,7 +16,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
     print(f"{request}: {exc_str}")
     content = {'status_code': 10422, 'message': exc_str, 'data': None}
-    return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    return JSONResponse(content=content, status_code=status.HTTP_200_OK)
 
 
 @app.get("/poll", response_model=PollResult)
