@@ -7,9 +7,12 @@ import time
 class Flasher:
     def __init__(self):
         self.should_flash = False
-
-        # Pin Definitons:
         self.led_pin = 23  # Broadcom pin 23 (P1 pin 16)
+
+        self.init_GPIO()
+
+    def init_GPIO(self):
+        # Pin Definitons:
         self.should_flash = False
 
         # Pin Setup:
@@ -19,11 +22,10 @@ class Flasher:
         # Initial state for LEDs:
         GPIO.output(self.led_pin, GPIO.LOW)
 
+        threading.Thread(target=self.__run_flash).start()
+
     def flash(self):
-        if not self.should_flash:
-            self.should_flash = True
-            t = threading.Thread(target=self.__run_flash)
-            t.start()
+        self.should_flash = True
 
     def stop(self):
         self.should_flash = False
