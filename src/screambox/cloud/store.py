@@ -19,15 +19,41 @@ key.
 
 The `$PAGERDUTY_STATUS` and `$PAGERDUTY_INCIDENT_KEY` are passed by PagerDuty when it triggers this webhook.
 """
+import abc
 import uuid
+from typing import Protocol
 
 from google.cloud import firestore
 
 from screambox.model import Incident, OPEN_STATUSES
 
 
-class Datastore:
+class Datastore(abc.ABC):
+    @abc.abstractmethod
+    def open_incidents(self) -> list[Incident]:
+        pass
+
+    @abc.abstractmethod
+    def closed_incidents(self):
+        pass
+
+    @abc.abstractmethod
+    def set_state(self, incident_key: str, state: str):
+        pass
+
+    @abc.abstractmethod
+    def delete_incident(self, incident_key: str):
+        pass
+
+
+class DatastoreFactory(Protocol):
+    def __call__(self, user: str) -> Datastore:
+        pass
+
+
+class FirestoreDatastore(Datastore):
     """Access and modify the incidents associated with a user."""
+
     def __init__(self, db: firestore.Client, user: str):
         self.db = db
         self.user_doc = db.collection("users").document(user)
@@ -57,7 +83,23 @@ class Datastore:
         doc.delete()
 
 
-class Userstore:
+def firestore_datastore_factory(user: str) -> FirestoreDatastore:
+    db = firestore.Client()
+    return FirestoreDatastore(db, user)
+
+
+class Userstore(abc.ABC):
+    @abc.abstractmethod
+    def register(self, secret_key: str) -> str:
+        pass
+
+
+class UserstoreFactory(Protocol):
+    def __call__(self) -> Userstore:
+        pass
+
+
+class FirestoreUserstore(Userstore):
     """
     The user store contains a mapping between user ID and webhook secret key.
 
@@ -89,3 +131,8 @@ class Userstore:
         self.users_coll.document(user_id).set({"secret_key": secret_key})
 
         return user_id
+
+
+def firestore_userstore_factory() -> FirestoreUserstore:
+    db = firestore.Client()
+    return FirestoreUserstore(db)

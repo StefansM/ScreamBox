@@ -4,9 +4,7 @@ Implementations of cloud functions that control the cloud portion of the ScreamB
 import dataclasses
 from typing import Any, Dict, Tuple
 
-from google.cloud import firestore
-
-from screambox.cloud.store import Datastore, Userstore
+from screambox.cloud.store import DatastoreFactory, UserstoreFactory
 from screambox.model import INTERESTING_EVENTS
 
 
@@ -46,7 +44,7 @@ def error(error_string: str, status_code: int) -> Tuple[Dict[str, Any], int]:
     return {"error": error_string}, status_code
 
 
-def trigger(request):
+def trigger(request, store_factory: DatastoreFactory):
     try:
         user = _query_param(request, "user")
 
@@ -54,30 +52,30 @@ def trigger(request):
         event = _body_param(request_json, "event", "event")
         event_type = _body_param(event, "event_type", "event.event_type")
 
+        incident_key = _body_param(event, "incident_key", "event.incident_key")
+
+        store = store_factory(user)
+
         if event_type not in INTERESTING_EVENTS:
             return success()
 
-        incident_key = _body_param(event, "incident_key", "event.incident_key")
-
-        db = firestore.Client()
-        store = Datastore(db, user)
         store.set_state(incident_key, event_type)
 
     except HttpException as e:
         return error(str(e), 400)
     except ValueError:
-        return error("User does not exist", 400)
+        return error("User does not exist", 404)
 
     return success()
 
 
-def register(request):
+def register(request, user_store_factory: UserstoreFactory):
     try:
         request_json = request.get_json()
         webhook_key = _body_param(request_json, "webhook_key", "webhook_key")
 
-        db = firestore.Client()
-        user_store = Userstore(db)
+        user_store = user_store_factory()
+
         uid = user_store.register(webhook_key)
 
         return {"user_id": str(uid)}, 200
@@ -86,12 +84,12 @@ def register(request):
         return error(str(e), 400)
 
 
-def list_incidents(request):
+def list_incidents(request, store_factory: DatastoreFactory):
     try:
         user = _query_param(request, "user")
 
-        db = firestore.Client()
-        store = Datastore(db, user)
+        store = store_factory(user)
+
         results = [dataclasses.asdict(i) for i in store.open_incidents()]
         return {"open_incidents": results}, 200
 
